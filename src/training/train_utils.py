@@ -4,6 +4,8 @@ import random
 
 def generate_batch_indices(batch_size, sentence_length_dict_original):
     """
+    Given a set of training examples of different sizes, create minibatches that group together
+    examples of similar length (to minimize the need for padding).
 
     :param batch_size:
     :param sentence_length_dict_original:
