@@ -1,6 +1,6 @@
 from setuptools import setup
 
-setup(name=food_tools,
+setup(name='food_tools',
       version=0.0,
       description='Code for NLP projects',
       author="Carol Anderson",
