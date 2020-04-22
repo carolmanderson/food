@@ -84,12 +84,9 @@ def get_token_embeddings(embeddings_file, embedding_dim, vocabulary, token_frequ
         -token_to_index: dictionary with token string as key, index as value
         -embeddings: list of numpy arrays, each of which is an embedding. The embedding's index in the
         list corresponds to its index in token_to_index.
-
-    .. note:: Case-sensitive. If a word and its lowercase version are both in the vocabulary and embeddings,
-    each will have a distinct embedding.
     """
 
-    token_to_index = {"PADDING":0, "UNKNOWN_TOKEN":1}
+    token_to_index = {"PADDING":0, "UNKNOWN_TOKEN":1, "NUMERIC": 2}
     embeddings = []
 
     # add padding token to embeddings
@@ -109,8 +106,11 @@ def get_token_embeddings(embeddings_file, embedding_dim, vocabulary, token_frequ
                 embeddings.append(vector)
 
     # check for tokens found abundantly in this dataset but not in the embeddings
+    # make an embedding for the lowercase version of the token
     for token in vocabulary:
         if token in token_to_index:
+            continue
+        if token.lower() in token_to_index:
             continue
         elif vocabulary[token] > token_frequency_threshold:  # if the token appears at least this number of times in this dataset, make an embedding for it
             vector = np.random.uniform(-0.25, 0.25, embedding_dim)
@@ -143,8 +143,10 @@ def examples_to_indices(dataset, label_to_index, token_to_index):
                 token_indices.append(token_to_index[token])
             elif token.lower() in token_to_index:
                 token_indices.append(token_to_index[token.lower()])
+            elif token.isnumeric():
+                token_indices.append(token_to_index["NUMERIC"])
             else:
-                token_indices.append(token_to_index["UNKNOWN_TOKEN"])   # TODO: check for numbers and use NUMERIC embedding
+                token_indices.append(token_to_index["UNKNOWN_TOKEN"])
         sentence_list.append({"tokens" : token_indices, "labels": label_indices})
     return sentence_list
 
