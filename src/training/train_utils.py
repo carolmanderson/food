@@ -1,30 +1,41 @@
+from collections import defaultdict
 import copy
 import random
+from typing import List
 
 
-def generate_batch_indices(batch_size, sentence_length_dict_original):
+def make_sentence_length_dict(sentence_lengths: List[int]):
+    """
+    Given a list of integers, each of which is the number of tokens in the document
+    at that index in a dataset,  make a dict with number of tokens as key,
+    list of sentence indices as value, for purposes of bucketing imilar length documents together.
+
+    :param sentence_lengths: list of integers, each representing the number of tokens in the document
+    at the corresponding index in a dataset
+    :return: dictionary with integer as key, list of integers as value
+    """
+    sentence_length_dict = defaultdict(list)
+
+    for i, length in enumerate(sentence_lengths):
+        sentence_length_dict[length].append(i)
+    return sentence_length_dict
+
+
+
+def generate_batch_indices(batch_size: int, sentence_lengths: List[int], random_seed: int = None):
     """
     Given a set of training examples of different sizes, create minibatches that group together
     examples of similar length (to minimize the need for padding).
 
-    :param batch_size:
-    :param sentence_length_dict_original:
-    :return:
+    :param batch_size: int, desired number of documents per batch
+    :param sentence_lengths: list of ints,each of which is the number of tokens in the document
+        at that index in a dataset
+    :param random_seed: integer, used to set random seed for unit test
+    :return: a generator that yields a list of integer indices of the documents to be used in each batch
     """
-
-    # TODO: allow random seed to be passed as param
 
 
     def add_sentences_to_batch(batch_indices, batch_size, sentence_lengths, sentence_length_dict, current_index):
-        """
-
-        :param batch_indices:
-        :param batch_size:
-        :param sentence_lengths:
-        :param sentence_length_dict:
-        :param current_index:
-        :return:
-        """
         num_sentences_needed = batch_size - len(batch_indices)
         current_length = sentence_lengths[current_index]
         num_sentences_available = len(sentence_length_dict[current_length])
@@ -37,14 +48,8 @@ def generate_batch_indices(batch_size, sentence_length_dict_original):
                 batch_indices.extend([chosen])
                 sentence_length_dict[current_length].remove(chosen)
 
-    def pick_direction(sorted_list, current_length, index):
-        """
 
-        :param sorted_list:
-        :param current_length:
-        :param index:
-        :return:
-        """
+    def pick_direction(sorted_list, current_length, index):
         if index >= len(sorted_list) - 1:
             return "down"
         elif index == 0:
@@ -57,6 +62,9 @@ def generate_batch_indices(batch_size, sentence_length_dict_original):
             else:
                 return "down"
 
+    if random_seed:
+        random.seed(random_seed)
+    sentence_length_dict_original = make_sentence_length_dict((sentence_lengths))
     sentence_length_dict = copy.deepcopy(sentence_length_dict_original)
     sentence_lengths = list(sentence_length_dict.keys())
     sentence_lengths.sort()
@@ -97,20 +105,17 @@ def generate_batch_indices(batch_size, sentence_length_dict_original):
 
 
 if __name__ == "__main__":
-    sentence_length_dict = {9: [0, 12], 2: [1, 2, 21], 30: [3, 14, 25], 31: [4], 33: [5, 26], 25: [6], 40: [7], 28: [8],
-                            37: [9], 27: [10], 1: [11], 26: [13], 35: [15, 22, 23], 39: [16], 34: [17], 15: [18],
-                            16: [19], 10: [20], 32: [24]}
+    sentence_lengths = [9, 2, 2, 30, 31, 33, 25, 40, 28, 37, 27, 1, 9, 26, 30, 35, 39, 34, 15, 16, 10, 2, 35, 35, 32, 30, 33]
 
     batch_size = 4
 
     all_batches = []
-    batch_generator = generate_batch_indices(batch_size, sentence_length_dict)
-
+    batch_generator = generate_batch_indices(batch_size, sentence_lengths, random_seed=2)
     for batch in batch_generator:
         print("NEW BATCH:", batch)
         all_batches.append(batch)
     print(all_batches)
-
+    #
     # check that all sentence indices got assigned to batches
     all_indices_in_batches = []
     for batch in all_batches:
@@ -126,4 +131,3 @@ if __name__ == "__main__":
     assert all_indices_in_batches == expected_indices
 
 
-    # TODO: test batch sizes
