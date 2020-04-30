@@ -135,8 +135,10 @@ def examples_to_indices(dataset, label_to_index, token_to_index):
     for sentence in dataset:
         token_indices = []
         label_indices = []
+        raw_tokens = []
         for item in sentence:
             token = item[0]
+            raw_tokens.append(token)
             label = item[1]
             label_indices.append(label_to_index[label])
             if token in token_to_index:
@@ -147,7 +149,7 @@ def examples_to_indices(dataset, label_to_index, token_to_index):
                 token_indices.append(token_to_index["NUMERIC"])
             else:
                 token_indices.append(token_to_index["UNKNOWN_TOKEN"])
-        sentence_list.append({"tokens" : token_indices, "labels": label_indices})
+        sentence_list.append({"raw_tokens": raw_tokens, "tokens" : token_indices, "labels": label_indices})
     return sentence_list
 
 
