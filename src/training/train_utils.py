@@ -1,7 +1,16 @@
 from collections import defaultdict
 import copy
 import random
+import time
 from typing import List
+
+import numpy as np
+
+
+def get_current_time():
+    t = time.localtime()
+    current_time = time.strftime("%H_%M_%S", t)
+    return current_time
 
 
 def make_sentence_length_dict(sentence_lengths: List[int]):
@@ -102,6 +111,19 @@ def generate_batch_indices(batch_size: int, sentence_lengths: List[int], random_
                                            current_index)
 
         yield (batch_indices)
+
+
+def form_ner_train_matrices(sentence):
+    tokens = np.expand_dims(sentence['tokens'], axis=0)
+    labels = sentence['labels']
+    labels = np.expand_dims(labels, axis=0)
+    labels = np.expand_dims(labels, axis=-1)
+    return np.array(tokens), np.array(labels)
+
+
+def form_ner_pred_matrix(tokens):
+    tokens = np.expand_dims(tokens, axis=0)
+    return np.array(tokens)
 
 
 if __name__ == "__main__":

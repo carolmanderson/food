@@ -69,7 +69,8 @@ def make_label_map(dataset):
     return label_to_index
 
 
-def get_token_embeddings(embeddings_file, embedding_dim, vocabulary, token_frequency_threshold):
+def get_token_embeddings(embeddings_file, embedding_dim, vocabulary,
+                         token_frequency_threshold, in_vocab_only=False):
     """
     Create a mapping of token to index, and also make a list of embeddings.
 
@@ -79,6 +80,8 @@ def get_token_embeddings(embeddings_file, embedding_dim, vocabulary, token_frequ
     their frequency counts as values
     :param token_frequency_threshold int: if the token appears at least this
     number of times in this dataset, make a new randomly initialized embedding for it
+    :param in_vocab_only: bool; if True, only get embeddings that are in the vocabulary;
+    otherwise get all the embeddings in the embeddings file
 
     :returns:
         -token_to_index: dictionary with token string as key, index as value
@@ -95,13 +98,20 @@ def get_token_embeddings(embeddings_file, embedding_dim, vocabulary, token_frequ
     # add a random vector to initialize unknown token
     vector = np.random.uniform(-0.25, 0.25, embedding_dim)
     embeddings.append(vector)
+    # add a random vector to initialize numeric token
+    vector = np.random.uniform(-0.25, 0.25, embedding_dim)
+    embeddings.append(vector)
 
-    # iterate through embeddings and pull out the tokens found in this dataset
+    # iterate through embeddings in the embeddings file
     with open(embeddings_file, 'r') as emb_file:
         for line in emb_file:
             token, *vector = line.rstrip().split(" ")
             assert len(vector) == embedding_dim
-            if token in vocabulary:
+            if in_vocab_only:
+                if token in vocabulary:
+                    token_to_index[token] = len(token_to_index)
+                    embeddings.append(vector)
+            else:
                 token_to_index[token] = len(token_to_index)
                 embeddings.append(vector)
 
@@ -152,6 +162,26 @@ def examples_to_indices(dataset, label_to_index, token_to_index):
         sentence_list.append({"raw_tokens": raw_tokens, "tokens" : token_indices, "labels": label_indices})
     return sentence_list
 
+
+def tokens_to_indices(tokens, token_to_index):
+    """
+    Given tokens for prediction, convert them to indices.
+    :param tokens: a list of strings
+    :param token_to_index dict: token as key, index as value
+    :returns list: a list of integer indices
+    """
+
+    token_indices = []
+    for token in tokens:
+        if token in token_to_index:
+            token_indices.append(token_to_index[token])
+        elif token.lower() in token_to_index:
+            token_indices.append(token_to_index[token.lower()])
+        elif token.isnumeric():
+            token_indices.append(token_to_index["NUMERIC"])
+        else:
+            token_indices.append(token_to_index["UNKNOWN_TOKEN"])
+    return token_indices
 
 
 
