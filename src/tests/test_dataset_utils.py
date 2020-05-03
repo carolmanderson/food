@@ -1,5 +1,5 @@
 import pytest
-from src.training.dataset_utils import compile_vocabulary
+from src.training.dataset_utils import compile_vocabulary, split_label, correct_BIO_encodings
 
 @pytest.fixture
 def dataset():
@@ -38,6 +38,59 @@ def test_originalcase(dataset):
     assert vocab == compiled_vocab
 
 
+def test_split_label_1():
+    assert split_label("B-FOOD") == ("B-", "FOOD")
 
 
+def test_split_label_2():
+    assert split_label("O") == ("O", "O")
 
+
+def test_BIO_encoding_1():
+    raw_preds = ['O',
+                 'I-FOOD',
+                 'O',
+                 'B-FOOD',
+                 'I-FOOD',
+                 'O',
+                 'B-FOOD',
+                 'O',
+                 'O',
+                 'I-FOOD',
+                 'O',
+                 'B-FOOD',
+                 'O',
+                 'I-FOOD',
+                 'I-FOOD',
+                 'O',
+                 'O',
+                 ]
+
+    corrected_preds = ['O',
+                 'B-FOOD',
+                 'O',
+                 'B-FOOD',
+                 'I-FOOD',
+                 'O',
+                 'B-FOOD',
+                 'O',
+                 'O',
+                 'B-FOOD',
+                 'O',
+                 'B-FOOD',
+                 'O',
+                 'B-FOOD',
+                 'I-FOOD',
+                 'O',
+                 'O',
+                 ]
+    assert correct_BIO_encodings(raw_preds) == corrected_preds
+
+def test_BIO_encoding_2():
+    raw_preds = ['I-TOOL',
+             'I-FOOD',
+             'O',]
+    corrected_preds = ['B-TOOL',
+                 'B-FOOD',
+                 'O', ]
+    assert correct_BIO_encodings(raw_preds) == corrected_preds

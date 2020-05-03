@@ -184,6 +184,37 @@ def tokens_to_indices(tokens, token_to_index):
     return token_indices
 
 
+def split_label(label):
+    """Split a label into the BIO tag and entity type."""
+    if label.startswith("B-"):
+        return "B-", label[2:]
+    elif label.startswith("I-"):
+        return "I-", label[2:]
+    elif label.startswith("O"):
+        return "O", "O"
+    else:
+        raise Exception("Found non-BIO label: {}!".format(label))
+
+
+def correct_BIO_encodings(labels):
+    corrected_labels = []
+    curr_tag = "O"
+    for i, label in enumerate(labels):
+        BIO_tag, base_label = split_label(label)
+        if BIO_tag == "B-":
+            curr_tag = base_label
+            corrected_labels.append(label)
+        elif BIO_tag == "I-":
+            if base_label == curr_tag:
+                corrected_labels.append(label)
+            else:
+                corrected_labels.append("B-" + base_label)
+                curr_tag = base_label
+        elif BIO_tag == "O":
+            corrected_labels.append(label)
+            curr_tag = "O"
+    return corrected_labels
+
 
 
 if __name__ == "__main__":

@@ -1,7 +1,7 @@
 from setuptools import setup
 
 setup(name='food_tools',
-      version=0.5,
+      version=0.6,
       description='Code for NLP projects',
       author="Carol Anderson",
       packages=['food_tools', 'food_tools.data_prep', 'food_tools.training',],

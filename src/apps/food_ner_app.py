@@ -1,5 +1,5 @@
+import argparse
 import pickle
-import sys
 
 import numpy as np
 from spacy.tokenizer import Tokenizer
@@ -8,7 +8,8 @@ from spacy import displacy
 import streamlit as st
 import tensorflow as tf
 from tensorflow.keras import backend as K
-from food_tools.training.dataset_utils import tokens_to_indices
+from food_tools.training.dataset_utils import \
+    tokens_to_indices, correct_BIO_encodings
 
 
 
@@ -79,13 +80,19 @@ def form_matrix(tokens):
 
 
 if __name__ == "__main__":
-    saved_model = "/Users/Carol/Google " \
-                  "Drive/nlp_data/saved_models/20200421_food_ner.h5"
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-m", "--model", help="saved model file")
+    parser.add_argument("-p", "--mappings", help="pickled mappings")
+    args = parser.parse_args()
 
-    saved_mappings = "/Users/Carol/Google " \
-                     "Drive/nlp_data/saved_models/20200421_food_ner_mappings" \
-                     ".pkl"
+    saved_model = args.model
+    saved_mappings = args.mappings
+    # saved_model = "/Users/Carol/Google Drive/nlp_data/output/20200503_16_50_50/20200503_16_50_50_food_ner_epoch_3_dev_f1_0.9867637173043644.h5"
 
+    # saved_mappings = "/Users/Carol/Google Drive/nlp_data/output/20200503_16_50_50/20200503_16_50_50_food_ner_mappings.pkl"
+
+    print(saved_model)
+    print(saved_mappings)
     HTML_WRAPPER = '<div style="overflow-x: auto; border: 1px solid #e6e9ef; ' \
                    'border-radius: 0.25rem; padding: 1rem; margin-bottom: ' \
                    '2.5rem">{}</div>'
@@ -97,14 +104,12 @@ if __name__ == "__main__":
     sentencizer, tokenizer  = load_sentencizer_and_tokenizer()
 
 
-    recipe_1 =  "Heat garlic and rosemary with oil. Drizzle oil over dip and serve with " \
-                    "vegetables."
-    recipe_2 = "Combine pineapple, banana, cream of coconut, rolled " \
-                "oats, quick-cooking oats, baking powder, mint, " \
-                "chia seeds, and poppy seeds in a blender; blend until " \
-                "smooth. Pour into 2 mugs."
+    recipe_1 =  "Scrub the potatoes and boil them in their jackets. Finely chop the scallions. Cover the scallions with cold milk and bring slowly to a boil. Simmer for about 3 to 4 minutes, then turn off the heat and leave to infuse. Peel and mash the freshly boiled potatoes and, while hot, mix with the boiling milk and scallions. Beat in some of the butter. Season to taste with salt and freshly ground pepper. Serve in one large or four individual bowls with a knob of butter melting in the center."
+    recipe_2 = "Wearing rubber gloves, peel chiles. Cut off tops of chiles and remove seeds and ribs. Discard husks from tomatillos and peel garlic. In a blender purée roasted vegetables and all remaining coulis ingredients except water , adding just enough water, 1 tablespoon at a time, if necessary to facilitate blending. Season coulis with salt. "
+    recipe_3 = "In a cocktail shaker, combine gin, Chambord, cranberry juice and egg white, shake the drink vigorously, and strain it into a chilled cocktail glass "
 
-    recipe_dict = {"Veg" : recipe_1, "Cake": recipe_2}
+    recipe_dict = {"Mashed potatoes" : recipe_1, "Chile coulis": recipe_2,
+                   "Cocktail": recipe_3}
 
     st.markdown("# Food finder")
 
@@ -127,6 +132,7 @@ if __name__ == "__main__":
             preds = model.predict([tokens_to_indices(tokens, token_to_index)])
             preds = np.argmax(preds, axis=-1)
             labels = [index_to_label[ind[0]] for ind in preds]
+            labels = correct_BIO_encodings(labels)
             doc = output_to_displacy(tokens, labels)
             if not final_doc:  # first sentence
                 final_doc = doc
