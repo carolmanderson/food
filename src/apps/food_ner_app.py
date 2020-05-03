@@ -81,24 +81,20 @@ def form_matrix(tokens):
 
 if __name__ == "__main__":
     parser = argparse.ArgumentParser()
-    parser.add_argument("-m", "--model", help="saved model file")
-    parser.add_argument("-p", "--mappings", help="pickled mappings")
+    parser.add_argument("model", help="saved model file")
+    parser.add_argument("mappings", help="pickled mappings")
     args = parser.parse_args()
 
     saved_model = args.model
     saved_mappings = args.mappings
-    # saved_model = "/Users/Carol/Google Drive/nlp_data/output/20200503_16_50_50/20200503_16_50_50_food_ner_epoch_3_dev_f1_0.9867637173043644.h5"
 
-    # saved_mappings = "/Users/Carol/Google Drive/nlp_data/output/20200503_16_50_50/20200503_16_50_50_food_ner_mappings.pkl"
-
-    print(saved_model)
-    print(saved_mappings)
     HTML_WRAPPER = '<div style="overflow-x: auto; border: 1px solid #e6e9ef; ' \
                    'border-radius: 0.25rem; padding: 1rem; margin-bottom: ' \
                    '2.5rem">{}</div>'
 
     model, session = load_model(saved_model)
     mappings = load_mappings(saved_mappings)
+
     index_to_label = {v: k for k, v in mappings['label_to_index'].items()}
     token_to_index = mappings['token_to_index']
     sentencizer, tokenizer  = load_sentencizer_and_tokenizer()
