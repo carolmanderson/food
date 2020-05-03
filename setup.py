@@ -8,7 +8,7 @@ setup(name='food_tools',
                 'food_tools.evaluation'],
       package_dir={'food_tools': 'src', 'food_tools.data_prep': 'src/data_prep',
             'food_tools.training': 'src/training', 'food_tools.evaluation':
-                         'src/evalution'},
+                         'src/evaluation'},
       install_requires=[
           'numpy', 'sklearn'
       ])
