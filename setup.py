@@ -8,5 +8,5 @@ setup(name='food_tools',
       package_dir={'food_tools': 'src', 'food_tools.data_prep': 'src/data_prep',
             'food_tools.training': 'src/training',},
       install_requires=[
-          'numpy', 'sklearn', 'tensorflow=1.15', "spacy", "streamlit"
+          'numpy', 'sklearn', 'tensorflow==1.15.2', "spacy", "streamlit"
       ])
