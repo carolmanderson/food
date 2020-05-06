@@ -1,6 +1,6 @@
 # Toy NLP project based on recipe data from Epicurious found on [Kaggle](https://www.kaggle.com/hugodarwood/epirecipes)
 
-I trained a simple LSTM-based model to detect mentions of food in recipes as an example of Named Entity Recognition.
+I trained a simple LSTM-based model to detect mentions of food in recipes as an example of Named Entity Recognition. Please see my blog post about this project [here](http://www.hiddenlayercake.com)
 
 ## Training data
 To make training data, I hand-labeled food mentions in a random subset of 300 recipes, consisting of 981 sentences, using the awesome labeling tool [Prodigy](https://prodi.gy).
