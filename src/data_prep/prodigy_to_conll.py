@@ -140,7 +140,7 @@ def write_conll(bio_tagged_spans, outfile):
         for sent in bio_tagged_spans:
             for tok in sent:
                 out.write(f"{tok['text']} {tok['start']} {int(tok['end']) + len(tok['text'])} {tok['record_id']} {tok['bio-tag']}\n")
-        out.write("\n")
+            out.write("\n")
 
 
 if __name__ == "__main__":

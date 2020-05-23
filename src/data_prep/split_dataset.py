@@ -1,7 +1,7 @@
 import random
 
 
-def train_dev_test_split(sequence, train_frac, dev_frac):
+def train_dev_test_split(sequence, train_frac, dev_frac, random_seed=None):
     """Given a list-like object, divide into training, dev, and test sets.
     :param sequence: a list, tuple, etc.
     :param train_frac: float between 0 and 1. What proportion of the data to put in the training set
@@ -9,6 +9,8 @@ def train_dev_test_split(sequence, train_frac, dev_frac):
                     Cannot be greater than 1-train_frac.
     :returns three lists with non-overlapping elements (training, dev, and test sets)
     """
+    if random_seed:
+        random.seed(random_seed)
     if train_frac > 1 or train_frac < 0 or dev_frac > 1 or dev_frac < 0:
         raise ValueError("train and dev fractions must be between 0 and 1!")
     if train_frac + dev_frac > 1:

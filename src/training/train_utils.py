@@ -115,6 +115,9 @@ def generate_batch_indices(batch_size: int, sentence_lengths: List[int], random_
 
 
 def form_ner_train_matrices(sentence):
+    """
+    Form a training matrix from a single document.
+    """
     tokens = np.expand_dims(sentence['tokens'], axis=0)
     labels = sentence['labels']
     labels = np.expand_dims(labels, axis=0)
@@ -122,9 +125,27 @@ def form_ner_train_matrices(sentence):
     return np.array(tokens), np.array(labels)
 
 
+def form_ner_batch_matrices(docs, token_to_index, label_to_index):
+    """
+    Pad batches of documents for NER model.
+    """
+    max_doc_length = max(len(doc['tokens']) for doc in docs)
+    padding_token = token_to_index["PADDING"]
+    padding_label = label_to_index["O"]
+    tokens = []
+    labels = []
+    for doc in docs:
+        padding_amount = max_doc_length - len(doc['tokens'])
+        assert padding_amount >= 0
+        tokens.append(doc['tokens'] + [padding_token]*padding_amount)
+        labels.append(doc['labels'] + [padding_label]*padding_amount)
+    return np.array(tokens), np.array(labels)
+
+
 def form_ner_pred_matrix(tokens):
     tokens = np.expand_dims(tokens, axis=0)
     return np.array(tokens)
+
 
 def perf_measure(y_actual, y_pred):
     """
