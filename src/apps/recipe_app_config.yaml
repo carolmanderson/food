@@ -1,0 +1,6 @@
+ner_model: /Users/Carol/Google Drive/nlp_data/output/20200523_22_06_28/20200523_22_06_28_food_ner_epoch_5_dev_f1_0.9851520816163143.h5
+ner_mappings: /Users/Carol/Google Drive/nlp_data/output/20200523_22_06_28/20200523_22_06_28_food_ner_mappings.pkl
+vegan_model: /Users/Carol/Google Drive/nlp_data/models/20200613_vegan.p
+kosher_model: /Users/Carol/Google Drive/nlp_data/models/20200613_kosher.p
+gf_model: /Users/Carol/Google Drive/nlp_data/models/20200613_gluten_free.p
+vectorizer: /Users/Carol/Google Drive/nlp_data/models/20200613_vectorizer.p
